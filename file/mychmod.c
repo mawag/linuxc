@@ -13,8 +13,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
+
 //#define DEBUG
 
 int main(int argc, char ** argv)
@@ -33,17 +35,17 @@ int main(int argc, char ** argv)
 	}
 
 	//获取参数
-	mode = atoi(argv[1]);
+	mode = atoi(argv[1]);				//获取并转换为整形
 	if (mode > 777 || mode < 0)
 	{
 		printf("mode number error!\n");
 		exit(0);
 	}
-	mode_u = mode / 100;
-	mode_g = ( mode - mode_u * 100) / 10;
-	mode_o = mode % 10;
-	path = argv[2];
-	mode = mode_u * 8 * 8 + mode_g * 8 +mode_o;
+	mode_u = mode / 100;				//所有者权限
+	mode_g = ( mode - mode_u * 100) / 10;		//用户组权限
+	mode_o = mode % 10;				//其他用户权限
+	path = argv[2];					//获取目标文件名
+	mode = mode_u * 8 * 8 + mode_g * 8 +mode_o;	//８进制转换
 
 	#ifdef DEBUG
 	printf("path:%s\nmode:%d-%d-%d\nmode=%d\n",path,mode_u,mode_g,mode_o,mode);
@@ -52,7 +54,7 @@ int main(int argc, char ** argv)
 	//权限更改，错误检测
 	if( chmod(path,mode) != 0)
 	{
-		perror("");		//错误情况输出
+		printf("%s:%s\n",argv[0],strerror(errno));	//错误情况输出
 		exit(1);
 	}
 
