@@ -7,7 +7,7 @@
 #   >>   Github: hithub.com/mawag
 #   >> 程序版本: 0.0.1
 #   >> 创建时间: 2014-07-13 17:30:44
-#   >> 修改时间: 2014-07-14 16:04:37
+#   >> 修改时间: 2014-07-14 16:35:35
 #  Copyright (c) wangbo  All rights reserved.
 =============================================================================*/
 
@@ -20,11 +20,13 @@
 #include <unistd.h>
 #include <errno.h>
 
-#define DEBUG
+//#define DEBUG
 
 void seerror(const char *error_string,int line)
 {
+	#ifdef DEBUG
 	printf("line:%d\n",line);
+	#endif
 	perror(error_string);
 }
 
@@ -37,7 +39,7 @@ int main(int argc,char ** argv)
 	char *file;		//文件内容
 	int flag = 0;		//参数
 
-	//参数检测
+	//参数合法性检测
 	if(argc == 1)
 	{
 		printf("\"cat <file name>\"\n");
@@ -85,23 +87,8 @@ int main(int argc,char ** argv)
 	if((fd = open(path,(O_RDONLY))) == -1)
 	//if((fd = creat (path,mode)) == -1)
 	{
-		if(2 == errno)
-		{
-			perror("open");
-			printf("Do you want to creat new file ? ");
-			if(getchar() == 'y')
-				if(creat(path,777) == -1)
-				{
-					perror("creat");
-					exit(1);
-				}
-			else exit(1);
-		}
-		else
-		{
-			seerror("open",__LINE__);
-			exit(1);
-		}
+		seerror("open",__LINE__);
+		exit(1);
 	}
 
 	//获取文件长度
