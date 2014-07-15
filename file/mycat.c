@@ -7,7 +7,7 @@
 #   >>   Github: hithub.com/mawag
 #   >> 程序版本: 0.0.1
 #   >> 创建时间: 2014-07-13 17:30:44
-#   >> 修改时间: 2014-07-14 16:35:35
+#   >> 修改时间: 2014-07-14 21:37:41
 #  Copyright (c) wangbo  All rights reserved.
 =============================================================================*/
 
@@ -42,8 +42,10 @@ int main(int argc,char ** argv)
 	//参数合法性检测
 	if(argc == 1)
 	{
-		printf("\"cat <file name>\"\n");
-		exit(1);
+		printf("\"cat <file name> <type>\"\n");
+		printf("input file name:");
+		path = malloc (50);
+		gets(path);
 	}
 	if(argc > 2)
 	{
@@ -54,12 +56,16 @@ int main(int argc,char ** argv)
 				for( j = 1; argv[i][j] != '\0'; j++)
 				{
 					//参数部分
-					if(argv[i][j] == 'n')
+					if((argv[i][j] == 'n')&&(flag != 1)&&(flag != 3)&&(flag != 5)&&(flag != 7))
 						flag += 1;
-					else if (argv[i][j] == 'b')
+					else if ((argv[i][j] == 'b')&&(flag != 2)&&(flag != 3)&&(flag != 6)&&(flag != 7))
 						flag += 2;
-					else if (argv[i][j] == 's')
+					else if ((argv[i][j] == 's')&&(flag != 4)&&(flag != 5)&&(flag != 6)&&(flag != 7))
 						flag += 4;
+					else if (argv[i][j] == ' ')
+						break;
+					else
+						printf("出现不合法参数\"%c\"，将被忽略！\n",argv[i][j]);
 				}
 			}
 			else
@@ -122,8 +128,8 @@ int main(int argc,char ** argv)
 	//显示文件
 	j = 0;
 	printf("filename:%s\ntype:%d\n",path,len);
-	printf(">>	start\n");
-	if((flag != 0)||(flag != 4))
+	printf(">>> start\n");
+	if((flag != 0)&&(flag != 4))
 		printf("%5d\t",++j);
 	for(i=0;i<len;i++)
 	{
@@ -141,7 +147,7 @@ int main(int argc,char ** argv)
 		}
 		printf("%c",*file++);
 	}
-	printf(">>	end\n");
+	printf(">>> end\n");
 
 	if(close(fd) == -1)
 	{
