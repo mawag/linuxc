@@ -20,7 +20,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
-#include <Linux/limits.h>
+#include <linux/limits.h>
 
 //#define DEBUG
 
