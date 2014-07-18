@@ -26,7 +26,7 @@
 #include <time.h>
 
 
-#define DEBUG
+//#define DEBUG
 
 
 //参数
@@ -56,6 +56,7 @@ void seerror(const char* error_string,int line)
 int showdirinfo(const struct dirent* ptr)
 {
 	printf("%s\t",ptr->d_name);
+	return 0;
 }
 
 //读取文件夹内文件并输出
@@ -158,31 +159,29 @@ int showdir(const char* path)
 		{
 			if (strcmp(name[j],name[j+1])> 0) 
 			{
-			/*	memmove(tmp,name[i],maxd_filename);
-				memmove(name[i],name[j],maxd_filename);
-				memmove(name[j],tmp,maxd_filename);
+				memmove(tmp,name[j],8);
+				memmove(name[j],name[1+j],8);
+				memmove(name[j+1],tmp,8);
 
 
-			*/	
-				strcpy (temp, name[j]);
-				temp[strlen (name[j])] = '\0';
+			/*	
+				strcpy (tmp, name[j]);
+				tmp[strlen (name[j])] = '\0';
 
 				strcpy (name[j], name[j + 1]);
 				name[j][strlen (name[j + 1])] = '\0';
 
-				strcpy (name[j + 1], temp);
-				name[j + 1][strlen (temp)] = '\0';
+				strcpy (name[j + 1], tmp);
+				name[j + 1][strlen (tmp)] = '\0';*/
 			}
 		}
 	}
 
 
-	#ifdef DEBUG
 	for(i = 0;i < d_dirfile;i++)
 	{
 		printf("%d,name:%s\n",i+1,name[i]);
 	}
-	#endif
 
 	return 0;
 }
