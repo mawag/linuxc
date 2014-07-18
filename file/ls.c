@@ -7,7 +7,7 @@
 #   >>   Github: hithub.com/mawag
 #   >> 程序版本: 0.0.1
 #   >> 创建时间: 2014-07-17 20:22:55
-#   >> 修改时间: 2014-07-17 20:22:55
+#   >> 修改时间: 2014-07-17 22:02:51
 #  Copyright (c) wangbo  All rights reserved.
 =============================================================================*/
 
@@ -28,6 +28,21 @@
 
 //#define DEBUG
 
+
+//参数
+typedef struct parameter
+{
+	int i;//i参数
+	int l;//l参数
+	int a;//a参数
+}par;
+
+
+//参数<全局变量>
+par opt;
+
+
+
 //显示错误信息
 void seerror(const char* error_string,int line)
 {
@@ -46,8 +61,12 @@ int showdirinfo(const struct dirent* ptr)
 //读取文件夹内文件并输出
 int showdir(const char* path)
 {
-	DIR		* dir;
-	struct dirent	* ptr;
+	int i;				//循环变量
+	char **name;			//文件名指针数组
+	int maxd_filename;		//最长文件名
+	int d_dirfile;			//文件夹内文件数
+	DIR *dir;			//文件夹
+	struct dirent *ptr;		//文件信息
 	/*
 	 *	struct dirent
 	 *	{
@@ -59,16 +78,45 @@ int showdir(const char* path)
 	 *	}*
 	 */
 
+	//初始化 
+	maxd_filename = 0;
+	d_dirfile = 0;
+
 	if ((dir = opendir(path)) == NULL) 
 	{
 		seerror("opendir",__LINE__);
 		return 1;
 	}
 
+	//获取最长文件名长度和文件数目
 	while ((ptr = readdir(dir))!=NULL) 
 	{
-		showdirinfo(ptr);
+		d_dirfile++;
+		if(ptr->d_reclen > maxd_filename)
+			d_dirfile+= ptr->d_reclen;
 	}
+
+
+	//把文件名存入数组
+	if((name = malloc ( d_dirfile * ( maxd_filename + 1))) == NULL)
+	{
+		seerror("malloc",__LINE__);
+		exit(1);
+	}
+	for(i = 0;i < d_dirfile; i++)
+	{
+		ptr = readdir(dir);
+		name[i] = ptr->d_name;
+	}
+
+	#ifdef DEUBG
+	for(i = 0;i < d_dirfile;i++)
+	{
+		printf("%s\n",name[i]);
+	}
+	#endif
+
+	
 
 	closedir(dir);
 
@@ -78,44 +126,60 @@ int showdir(const char* path)
 
 int main(int argc,char ** argv)
 {
-	int i;		//循环变量
-	int flag;	//标志位
-	char* path;
-	/*
-	 *	参数设置
-	 *	参数解析方案：
-	 *
-	 *	1，建立结构体，结构体内直接用数字说明状态
-	 *	2，设置int型参数位，通过按位运算来解析参数
-	 *	这里暂时使用方案1
-	 *
-	 */
-	struct param
+	int i;		//循环
+	int flag = 0;	//循环标志位
+	char* path;	//目录
+
+	//参数初始化
+	opt.a = 0;
+	opt.l = 0;
+	opt.i = 0;
+
+	opterr = 0;	//getopt不输出错误参数
+
+
+
+	//循环处理传入参数
+	while(flag != -1)
 	{
-		int p_i;//i参数
-		int p_l;//l参数
-		int p_a;//a参数
-	}
-
-
-	flag = 0;
-	//解析参数
-
-	//获取参数目录信息
-	for(i=1;i<argc;i++)
-	{
-		if(argv[i][0] != '-')
+		//调用getopt处理参数
+		switch(getopt( argc, argv, "ali"))
 		{
-			flag = 1;
-			path = argv[i];
-			showdir(path);
+			case 'a':
+				opt.a = 1;
+				break;
+			case 'l':
+				opt.l = 1;
+				break;
+			case 'i':
+				opt.i = 1;
+				break;
+			case -1:
+				flag = -1;
+				break;
+			case '?':
+				printf("出现非正常选项：%c，系统将忽略.\n",optopt);
+				break;
+			default:
+				break;
 		}
 	}
 
-	if(flag == 0)
+
+	if(optind == argc)
 	{
 		path = ".";
 		return (showdir(path));
+	}
+	else
+	{
+		for(i = optind; i < argc; i++)
+		{
+			path = argv[i];
+			printf("%s:\n",path);
+			showdir(path);
+			printf("\n");
+		}
 	}
 
 
