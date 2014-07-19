@@ -1,5 +1,5 @@
 /*=============================================================================
-#   >>   文件名: ls.c
+#   >>   文件名: l.c
 #   >> 	   描述: ls的简单实现
 #   >>     作者: wangbo
 #   >>    Email: mawag@live.cn
@@ -7,7 +7,7 @@
 #   >>   Github: hithub.com/mawag
 #   >> 程序版本: 0.0.1
 #   >> 创建时间: 2014-07-17 20:22:55
-#   >> 修改时间: 2014-07-18 15:00:17
+#   >> 修改时间: 2014-07-19 15:58:05
 #  Copyright (c) wangbo  All rights reserved.
 =============================================================================*/
 
@@ -35,6 +35,12 @@ typedef struct parameter
 	int i;//i参数
 	int l;//l参数
 	int a;//a参数
+	//int r;//r参数
+	int o;//o参数
+	int A;//A参数
+	int f;//f参数
+	int n;//n参数
+
 }par;
 
 
@@ -53,29 +59,11 @@ void seerror(const char* error_string,int line)
 }
 
 //处理文件夹内文件信息
-int showdirfile(char name[256][PATH_MAX + 1],int d_dirfile)
+int showdirfile(char name[1024][PATH_MAX + 1],int d_dirfile)
 {
 	int i,j;//循环变量
-
-	if((opt.l == 0)&&(opt.i == 0))
-	{
-		j == 0;
-		for(i=0;i<d_dirfile;i++)
-		{
-			j++;
-			printf("%s\t",name[i]);
-			if(j%5 == 0)
-				printf("\n");
-		}
-		printf("\n");
-
-	}
-	else
-	{
-		for(i=0;i<d_dirfile;i++)
-			showfile(name[i]);
-	}
-
+	for(i=0;i<d_dirfile;i++)
+		showfile(name[i]);
 	return 0;
 }
 
@@ -83,7 +71,8 @@ int showdirfile(char name[256][PATH_MAX + 1],int d_dirfile)
 //显示文件属性
 void print(struct stat* buf)
 {
-	char *time;
+	int t;				//临时变量
+	struct tm *time;		//时间
 	struct passwd *psd; 		//用户
 	struct group *grp; 		//用户组
 	
@@ -186,19 +175,30 @@ void print(struct stat* buf)
 		else 
 			printf ("-");
 		//链接数
-		printf("\t%-5ld", buf->st_nlink);
+		printf(" %4ld\t", buf->st_nlink);
+		
 		//用户名
 		psd = getpwuid (buf->st_uid);
-		printf ("%-10s", psd->pw_name);
+		if(opt.n == 1)
+			printf("%-5d",buf->st_uid);
+		else
+			printf ("%-10s", psd->pw_name);
+		
 		//所属组
-		grp = getgrgid (buf->st_gid);
-		printf ("%-10s", grp->gr_name);
+		if(opt.o == 0)
+		{
+			grp = getgrgid (buf->st_gid);
+			if(opt.n == 1)
+				printf("%-5d",buf->st_gid);
+			else
+				printf ("%-10s", grp->gr_name);
+		}
 		//文件大小
-		printf("%-6ld", buf->st_size);
+		printf("%6ld", buf->st_size);
+		
 		//时间
-		time = strdup(ctime(&buf->st_mtime));
-		time[strlen(time) -1] = '\0';
-		printf("%-s",time);
+		time = localtime(&buf->st_mtime);
+		printf("%3d月%3d  %02d:%02d",time->tm_mon+1,time->tm_mday,time->tm_hour,time->tm_min);
 	}
 }
 
@@ -237,7 +237,17 @@ int showfile(const char* filename)
 	else 
 	{
 	 	print(buf);
-		printf("\t%s\n",filename);
+		if((S_ISREG(buf->st_mode))&&((buf->st_mode & S_IXUSR)||(buf->st_mode & S_IXGRP)||(buf->st_mode & S_IXOTH)))
+			printf(" \033[1;32m%s\033[0m \n",filename);
+		else if(S_ISDIR(buf->st_mode))
+			printf(" \033[1;34m%s\033[0m \n",filename);
+		else if(S_ISLNK(buf->st_mode))
+			printf(" \033[1;36m%s\033[0m \n",filename);
+		else if(S_ISCHR(buf->st_mode))
+			printf(" \033[1;33;40m%s\033[0m \n",filename);
+		else
+			printf(" %s\n",filename);
+
 	}
 	return 0;
 }
@@ -247,7 +257,7 @@ int showdir(const char* path)
 {
 	int i,j;			//循环变量
 	char tmp[PATH_MAX + 1];		//临时变量
-	char name[256][PATH_MAX + 1];	//文件名数组
+	char name[1024][PATH_MAX + 1];	//文件名数组
 	int maxd_filename;		//最长文件名
 	int d_dirfile;			//文件夹内文件数
 	DIR *dir;			//文件夹
@@ -260,12 +270,16 @@ int showdir(const char* path)
 	 *		unsigned short d_reclen;	文件名长
 	 *		unsigned char d_type; 		文件类型
 	 *		char d_name [NAME_MAX+1]; 	文件名，最长256字符
-	 *	}*
+	 *	}
 	 */
 
 	//初始化 
 	maxd_filename = 0;
 	d_dirfile = 0;
+
+	#ifdef DEBUG
+	printf("showdir--open dir:%s\n",path);
+	#endif
 
 	//切换工作目录
 	if(chdir(path) == -1)
@@ -282,7 +296,9 @@ int showdir(const char* path)
 	}
 	while ((ptr = readdir(dir))!=NULL) 
 	{
-		if((opt.a == 0)&& (ptr->d_name[0] == '.'))
+		if((opt.a == 0)&& (ptr->d_name[0] == '.')&&(opt.A == 0))
+			continue;
+		if((opt.A == 1)&&((ptr->d_name == ".")||(ptr->d_name == "..")))
 			continue;
 		d_dirfile++;
 		if(maxd_filename < ptr->d_reclen)
@@ -309,14 +325,22 @@ int showdir(const char* path)
 			i--;
 			continue;
 		}
-		strcpy(name[i],ptr->d_name);
+	//	strcpy (name[i], path);
+	//	name[i][strlen(path)] = '\0';
+	//	strcat (name[i], ptr->d_name);
+	//	name[i][strlen(ptr->d_name)+strlen(path)] = '\0';
+	//
+	//
+		strcpy (name[i], ptr->d_name);
 		name[i][strlen(ptr->d_name)] = '\0';
+
 		#ifdef DEBUG
 		printf("%3d,name:%-10s,leny:%d,len:%d,sizeof:%lu\n",i,name[i],(int)strlen(ptr->d_name),(int)strlen(name[i]),sizeof(name[i]));
 		#endif
 	}
 
 	closedir(dir);
+
 	#ifdef DEBUG
 	for(i = 0;i < d_dirfile;i++)
 	{
@@ -324,25 +348,27 @@ int showdir(const char* path)
 	}
 	#endif
 
-	for (i = 0; i < d_dirfile - 1; i++) 
+	if(opt.f == 0)
 	{
-		for (j = 0; j < d_dirfile - 1- i; j++) 
+		for (i = 0; i < d_dirfile - 1; i++) 
 		{
-			if (strcmp(name[j],name[j+1])> 0) 
+			for (j = 0; j < d_dirfile - 1- i; j++) 
 			{
-				strcpy (tmp, name[j]);
-				tmp[strlen (name[j])] = '\0';
-
-				strcpy (name[j], name[j + 1]);
-				name[j][strlen (name[j + 1])] = '\0';
-
-				strcpy (name[j + 1], tmp);
-				name[j + 1][strlen (tmp)] = '\0';
+				if (strcmp(name[j],name[j+1])> 0) 
+				{
+					strcpy (tmp, name[j]);
+					tmp[strlen (name[j])] = '\0';
+	
+					strcpy (name[j], name[j + 1]);
+					name[j][strlen (name[j + 1])] = '\0';
+	
+					strcpy (name[j + 1], tmp);
+					name[j + 1][strlen (tmp)] = '\0';
+				}
 			}
 		}
+
 	}
-
-
 	#ifdef DEBUG
 	for(i = 0;i < d_dirfile;i++)
 	{
@@ -360,12 +386,17 @@ int main(int argc,char ** argv)
 {
 	int i;		//循环
 	int flag = 0;	//循环标志位
-	char* path;	//目录
+	char* path;	//目录或文件
+	struct stat buf;//获得的文件信息
 
 	//参数初始化
 	opt.a = 0;
 	opt.l = 0;
 	opt.i = 0;
+	opt.o = 0;
+	opt.A = 0;
+	opt.f = 0;
+	opt.n = 0;
 
 	opterr = 0;	//getopt不输出错误参数
 
@@ -375,16 +406,28 @@ int main(int argc,char ** argv)
 	while(flag != -1)
 	{
 		//调用getopt处理参数
-		switch(getopt( argc, argv, "ali"))
+		switch(getopt( argc, argv, "alioAnf"))
 		{
 			case 'a':
 				opt.a = 1;
+				break;
+			case 'A':
+				opt.A = 1;
+				break;
+			case 'n':
+				opt.n = 1;
+				break;
+			case 'f':
+				opt.f = 1;
 				break;
 			case 'l':
 				opt.l = 1;
 				break;
 			case 'i':
 				opt.i = 1;
+				break;
+			case 'o':
+				opt.o = 1;
 				break;
 			case -1:
 				flag = -1;
@@ -397,10 +440,13 @@ int main(int argc,char ** argv)
 		}
 	}
 
-
-	if((argc - optind) < 2)
+	#ifdef DEBUG
+	printf("argc - optind:%d\n",argc - optind);
+	#endif
+	//处理所有路径信息
+	if((argc - optind) < 1)
 	{
-		path = ".";
+		path = "./";
 		return (showdir(path));
 	}
 	else
@@ -408,8 +454,35 @@ int main(int argc,char ** argv)
 		for(i = optind; i < argc; i++)
 		{
 			path = argv[i];
-			printf("%s:\n",path);
-			showdir(path);
+		
+			#ifdef DEBUG
+			printf("open:%s\n",path);
+			#endif
+			if (stat (path, &buf) == -1) 
+			{
+				seerror("stat",__LINE__);
+				exit(1);
+			}
+
+			
+			//目录
+			if (S_ISDIR (buf.st_mode))
+			{
+				#ifdef DEBUG
+				printf("open dir:%s\n",path);
+				#endif
+				printf("%s:\n",path);
+				showdir(path);
+			}
+			else
+			{
+				#ifdef DEBUG
+				printf("open file:%s\n",path);
+				#endif
+				showfile(path);
+			}
+
+
 			printf("\n");
 		}
 	}
