@@ -63,7 +63,9 @@ int showdirfile(char name[1024][PATH_MAX + 1],int d_dirfile)
 {
 	int i,j;//循环变量
 	for(i=0;i<d_dirfile;i++)
+	{
 		showfile(name[i]);
+	}
 	return 0;
 }
 
