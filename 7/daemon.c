@@ -18,6 +18,7 @@
 #include <sys/param.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <signal.h>
 #include <errno.h>
 #include <time.h>
 #include <syslog.h>
