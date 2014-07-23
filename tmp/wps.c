@@ -7,7 +7,7 @@
 #   >>   Github: hithub.com/mawag
 #   >> 程序版本: 0.0.1
 #   >> 创建时间: 2014-07-17 20:22:55
-#   >> 修改时间: 2014-07-19 20:03:29
+#   >> 修改时间: 2014-07-21 09:16:41
 #  Copyright (c) wangbo  All rights reserved.
 =============================================================================*/
 
@@ -48,20 +48,21 @@ int wopen(char *path,int x)
 	char filename[]="★";
 	int i;
 	int c_ct=34;//框体颜色
+	printf("\033[0m");
 	printf("\033[1;%dm┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n",c_ct);
-	printf("\033[1;%dm┃                 \033[1;36m@   @   @    @@@@@@@@@    @@@@@@@@@\033[1;%dm                    ┃\n",c_ct);
-	printf("\033[1;%dm┃                 \033[1;36m@   @   @    @       @    @        \033[1;%dm                    ┃\n",c_ct);
-	printf("\033[1;%dm┃                 \033[1;36m @ @ @ @     @@@@@@@@@    @@@@@@@@@\033[1;%dm                    ┃\n",c_ct);
-	printf("\033[1;%dm┃                 \033[1;36m @ @ @ @     @                    @\033[1;%dm                    ┃\n",c_ct);
-	printf("\033[1;%dm┃                 \033[1;36m  @   @      @            @@@@@@@@@\033[1;%dm          ver:0.1   ┃\n",c_ct);
+	printf("\033[1;%dm┃                 \033[1;36m@   @   @    @@@@@@@@@    @@@@@@@@@\033[1;%dm                    ┃\n",c_ct,c_ct);
+	printf("\033[1;%dm┃                 \033[1;36m@   @   @    @       @    @        \033[1;%dm                    ┃\n",c_ct,c_ct);
+	printf("\033[1;%dm┃                 \033[1;36m @ @ @ @     @@@@@@@@@    @@@@@@@@@\033[1;%dm                    ┃\n",c_ct,c_ct);
+	printf("\033[1;%dm┃                 \033[1;36m @ @ @ @     @                    @\033[1;%dm                    ┃\n",c_ct,c_ct);
+	printf("\033[1;%dm┃                 \033[1;36m  @   @      @            @@@@@@@@@\033[1;%dm          ver:0.1   ┃\n",c_ct,c_ct);
 	printf("\033[1;%dm┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n",c_ct);
 
-	printf("\033[1;%dm┃                                                                        \033[1;%dm┃\n",c_ct);
-	printf("\033[1;%dm┃\033[1;36m         ① wps文字             ② wpp演示           ③ et表格             \033[1;%dm┃\n",c_ct);
-	printf("\033[1;%dm┃                                                                        \033[1;%dm┃\n",c_ct);
+	printf("\033[1;%dm┃                                                                        \033[1;%dm┃\n",c_ct,c_ct);
+	printf("\033[1;%dm┃\033[1;36m         ① wps文字             ② wpp演示           ③ et表格             \033[1;%dm┃\n",c_ct,c_ct);
+	printf("\033[1;%dm┃                                                                        \033[1;%dm┃\n",c_ct,c_ct);
 	printf("\033[1;%dm┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫\n",c_ct);
 	printf("\033[1;%dm┃                                                                        ┃\n",c_ct);
-	printf("\033[1;%dm┃\033[1;36m      欢迎使用办公文件智能辅助系统                                      \033[1;%dm┃\n",c_ct);
+	printf("\033[1;%dm┃\033[1;36m      欢迎使用办公文件智能辅助系统                                      \033[1;%dm┃\n",c_ct,c_ct);
 	printf("\033[1;%dm┃                                                                        ┃\n",c_ct);
 	if(path == NULL)
 	{
@@ -95,12 +96,48 @@ int wopen(char *path,int x)
 
 	printf("\n");
 
+	return 0;
+
 }
 
 //根据返回值类型使用特定程序打开文件
 int rr(char path[],int t)
 {
+	int choose;
 	char t1[80];
+	pid_t pid;
+
+	wopen(path,t);
+	if(t == 0)
+	{
+	        while(t == 0)
+	        {
+			printf("Please input your choose:\033[1;4m");
+        		scanf("%d",&choose);
+			printf("\033[0m");
+			switch(choose)
+			{
+				case 1:
+					t = 1;
+					break;
+				case 2:
+					t = 2;
+					break;
+				case 3:
+					t = 3;
+					break;
+				case 4:
+					printf("\033[0m");
+					exit(0);
+				case 0:
+					printf("\033[0m");
+					exit(0);
+				default:
+					break;
+			}
+		}
+	}
+	//系统命令组合中
 	if(t == 1)
 		strcpy(t1,WORD_ADD);
 	else if(t == 2)
@@ -112,8 +149,16 @@ int rr(char path[],int t)
 		strcat(t1," ");
 		strcat(t1,path);
 	}
-	wopen(path,t);
-	puts(t1);
+
+	printf("\033[0m");
+
+	pid = vfork();
+
+	if(pid == 0)
+	{
+		system(t1);
+		exit(0);
+	}
 
 	return 0;
 }
@@ -125,7 +170,7 @@ int ss(char path[],int n)
 	char tmp[30];
 	for(i = n;path[i] != '.';i-- );
 
-	printf("%d,%s\n",i,(char *)&(path[i+1]));
+	//printf("%d,%s\n",i,(char *)&(path[i+1]));
 	strcpy(tmp,((char *)&(path[i+1])));
 
 	if 	 ((strcmp("doc",tmp) == 0) || (strcmp("docx",tmp) == 0)\
@@ -143,7 +188,7 @@ int ss(char path[],int n)
 		||(strcmp("xlt",tmp) == 0) || (strcmp("xl",tmp) == 0))
 		rr(path,3);
 	else
-		wopen(path,0);
+		rr(path,0);
 	return 0;
 }
 

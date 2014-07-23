@@ -77,7 +77,7 @@ void print(struct stat* buf)
 	struct tm *time;		//时间
 	struct passwd *psd; 		//用户
 	struct group *grp; 		//用户组
-	
+
 	if(opt.i == 1)
 		printf("%-6ld\t", buf->st_ino);
 	if(opt.l == 1)
@@ -160,32 +160,32 @@ void print(struct stat* buf)
 		{
 			printf ("r");
 		}
-		else 
+		else
 			printf ("-");
 
 		if (buf->st_mode & S_IWOTH)
 		{
 			printf ("w");
 		}
-		else 
+		else
 			printf ("-");
 
 		if (buf->st_mode & S_IXOTH)
 		{
 			printf ("x");
 		}
-		else 
+		else
 			printf ("-");
 		//链接数
 		printf(" %4ld\t", buf->st_nlink);
-		
+
 		//用户名
 		psd = getpwuid (buf->st_uid);
 		if(opt.n == 1)
 			printf("%-5d",buf->st_uid);
 		else
 			printf ("%-10s", psd->pw_name);
-		
+
 		//所属组
 		if(opt.o == 0)
 		{
@@ -197,7 +197,7 @@ void print(struct stat* buf)
 		}
 		//文件大小
 		printf("%6ld", buf->st_size);
-		
+
 		//时间
 		time = localtime(&buf->st_mtime);
 		printf("%3d月%3d  %02d:%02d",time->tm_mon+1,time->tm_mday,time->tm_hour,time->tm_min);
@@ -216,10 +216,10 @@ int showfile(const char* filename)
 	buf = malloc (sizeof(struct stat));
 
 	//文件状态结构体
-	//	struct stat  
-	//	{  
-	//		dev_t       st_dev;     /* 文件所在设备的ID*/  
-	//		ino_t       st_ino;     /* inode节点号*/  
+	//	struct stat
+	//	{
+	//		dev_t       st_dev;     /* 文件所在设备的ID*/
+	//		ino_t       st_ino;     /* inode节点号*/
 	//		mode_t      st_mode;    /* 文件的类型和存储权限*/  
 	//		nlink_t     st_nlink;   /* 链向此文件的连接数(硬连接)*/  
 	//		uid_t       st_uid;     /* user ID*/  
@@ -352,18 +352,18 @@ int showdir(const char* path)
 
 	if(opt.f == 0)
 	{
-		for (i = 0; i < d_dirfile - 1; i++) 
+		for (i = 0; i < d_dirfile - 1; i++)
 		{
-			for (j = 0; j < d_dirfile - 1- i; j++) 
+			for (j = 0; j < d_dirfile - 1- i; j++)
 			{
-				if (strcmp(name[j],name[j+1])> 0) 
+				if (strcmp(name[j],name[j+1])> 0)
 				{
 					strcpy (tmp, name[j]);
 					tmp[strlen (name[j])] = '\0';
-	
+
 					strcpy (name[j], name[j + 1]);
 					name[j][strlen (name[j + 1])] = '\0';
-	
+
 					strcpy (name[j + 1], tmp);
 					name[j + 1][strlen (tmp)] = '\0';
 				}
@@ -456,7 +456,7 @@ int main(int argc,char ** argv)
 		for(i = optind; i < argc; i++)
 		{
 			path = argv[i];
-		
+
 			#ifdef DEBUG
 			printf("open:%s\n",path);
 			#endif
@@ -466,7 +466,7 @@ int main(int argc,char ** argv)
 				exit(1);
 			}
 
-			
+
 			//目录
 			if (S_ISDIR (buf.st_mode))
 			{
