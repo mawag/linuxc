@@ -1,3 +1,15 @@
+/*=============================================================================
+#   >>   文件名: mynice.c
+#   >> 	   描述: 课本测试
+#   >>     作者: wangbo
+#   >>    Email: mawag@live.cn
+#   >>	   主页: http://www.cnblogs.com/wangbo2008/
+#   >>   Github: github.com/mawag
+#   >> 程序版本: 0.0.1
+#   >> 创建时间: 2014-07-23 15:12:38
+#   >> 修改时间: 2014-07-23 15:12:38
+#  Copyright (c) wangbo  All rights reserved.
+=============================================================================*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

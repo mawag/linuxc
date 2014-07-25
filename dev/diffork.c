@@ -1,3 +1,15 @@
+/*=============================================================================
+#   >>   文件名: diffork.c
+#   >> 	   描述: 课本源程序测试
+#   >>     作者: wangbo
+#   >>    Email: mawag@live.cn
+#   >>	   主页: http://www.cnblogs.com/wangbo2008/
+#   >>   Github: github.com/mawag
+#   >> 程序版本: 0.0.1
+#   >> 创建时间: 2014-07-21 12:09:57
+#   >> 修改时间: 2014-07-21 12:09:57
+#  Copyright (c) wangbo  All rights reserved.
+=============================================================================*/
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -8,7 +20,7 @@ int main(void)
 {
 	pid_t  pid;
 	int    var = 1, i;
-	
+
 	printf("fork is diffirent with vfrok \n");
 
 	pid = fork();
@@ -34,7 +46,7 @@ int main(void)
 			{
 				printf("Parent process is running\n");
 				globVar++;
-				var++;		
+				var++;
 				sleep(1);
 			}
 			printf("Parent's globVar = %d ,var = %d\n", globVar ,var);
