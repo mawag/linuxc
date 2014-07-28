@@ -34,11 +34,11 @@ void seerror(const char *error_string, int line)
 	perror(error_string);
 }
 
-void print_prompt(void);	/* 打印提示符 */
-void get_input(char *buf);	/* 得到输入的命令 */
+void print_prompt(void);						/* 打印提示符 */
+void get_input(char *buf);						/* 得到输入的命令 */
 void explain_input(char *buf, int *argcount, char arglist[100][256]);	/* 对输入命令进行解析 */
-void do_cmd(int argcount, char arglist[100][256]);	/* 执行命令 */
-int find_command(char *command);	/* 查找命令中的可执行程序 */
+void do_cmd(int argcount, char arglist[100][256]);			/* 执行命令 */
+int find_command(char *command);					/* 查找命令中的可执行程序 */
 
 //打印提示符
 void print_prompt(void)
@@ -239,8 +239,10 @@ void do_cmd(int argcount, char arglist[100][256])
 			}
 			break;
 		case 1:
-			if (pid == 0) {
-				if (!(find_command(arg[0]))) {
+			if (pid == 0)
+			{
+				if (!(find_command(arg[0])))
+				{
 					printf("%s:command not found\n", arg[0]);
 					exit(0);
 				}
@@ -375,11 +377,13 @@ int main(int argc, char **argv)
 
 	printf("欢迎使用精简版shell\n");
 	buf = malloc(256);
-	if (buf == NULL) {
+	if (buf == NULL)
+	{
 		seerror("malloc", __LINE__);
 		exit(1);
 	}
-	do {
+	do
+	{
 		print_prompt();
 		memset(buf, 0, 256);
 		get_input(buf);
