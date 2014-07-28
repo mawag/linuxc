@@ -24,12 +24,35 @@ int main(int argc,char **argv)
 {
 	char *name;
 	char *path;
+	char pa[20][50];
+	int i,j,k;
 
-	name = getenv("LOGNAME");
-	path = getenv("PWD");
 
-	printf("logname = %s\n",name);
-	printf("pwd = %s\n",path);
+	name = getenv("HOSTNAME");
+	path = getenv("PATH");
+
+	for(i=0,j=0,k=0;*(path+i)!='\0';i++)
+	{
+		if(*(path+i)!=':')
+		{
+			pa[j][k]=*(path+i);
+			pa[j][k+1]='\0';
+			k++;
+		}
+		else
+		{
+			j++;
+			k=0;
+		}
+	}
+	pa[j+1][0]='\0';
+
+	printf("hostname = %s\n",name);
+	printf("path = %s\n",path);
+	for(i=0;pa[i][0]!='\0';i++)
+	{
+		printf("~~%s\n",pa[i]);
+	}
 
 	return 0;
 }

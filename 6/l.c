@@ -116,43 +116,43 @@ void print(struct stat* buf)
 		{
 			printf ("r");
 		}
-		else 
+		else
 			printf ("-");
 
 		if (buf->st_mode & S_IWUSR)
 		{
 			printf ("w");
 		}
-		else 
+		else
 			printf ("-");
 
 		if (buf->st_mode & S_IXUSR)
 		{
 			printf ("x");
 		}
-		else 
+		else
 			printf ("-");
 
-		//用户组权限 
+		//用户组权限
 		if (buf->st_mode & S_IRGRP)
 		{
 			printf ("r");
 		}
-		else 
+		else
 			printf ("-");
 
 		if (buf->st_mode & S_IWGRP)
 		{
 			printf ("w");
 		}
-		else 
+		else
 			printf ("-");
 
 		if (buf->st_mode & S_IXGRP)
 		{
 			printf ("x");
 		}
-		else 
+		else
 			printf ("-");
 
 		//其他用户权限
@@ -177,7 +177,7 @@ void print(struct stat* buf)
 		else
 			printf ("-");
 		//链接数
-		printf(" %4ld\t", buf->st_nlink);
+		printf(" %4d\t", buf->st_nlink);
 
 		//用户名
 		psd = getpwuid (buf->st_uid);
@@ -196,7 +196,7 @@ void print(struct stat* buf)
 				printf ("%-10s", grp->gr_name);
 		}
 		//文件大小
-		printf("%6ld", buf->st_size);
+		printf("%8ld", buf->st_size);
 
 		//时间
 		time = localtime(&buf->st_mtime);
@@ -212,6 +212,8 @@ int showfile(const char* filename)
 	int fd;			//文件描述符
 	int i;			//循环变量
 	struct stat* buf;	//文件属性
+	int link_e;		//链接路径长度
+	char link_buf[100];		//链接路径
 
 	buf = malloc (sizeof(struct stat));
 
@@ -236,7 +238,7 @@ int showfile(const char* filename)
 	//使用lstat
 	if(lstat(filename,buf) == -1)
 	       seerror("stat",__LINE__);
-	else 
+	else
 	{
 	 	print(buf);
 		if((S_ISREG(buf->st_mode))&&((buf->st_mode & S_IXUSR)||(buf->st_mode & S_IXGRP)||(buf->st_mode & S_IXOTH)))
@@ -244,7 +246,19 @@ int showfile(const char* filename)
 		else if(S_ISDIR(buf->st_mode))
 			printf(" \033[1;34m%s\033[0m \n",filename);
 		else if(S_ISLNK(buf->st_mode))
-			printf(" \033[1;36m%s\033[0m \n",filename);
+		{
+			printf(" \033[1;36m%s",filename);
+			if(opt.l == 1)
+			{
+				if((link_e = readlink(filename,link_buf,sizeof(link_buf))) == -1)
+				{
+					seerror("readlink",__LINE__);
+					exit(1);
+				}
+				link_buf[link_e]='\0';
+				printf("\033[0m > %s\n",link_buf);
+			}
+		}
 		else if(S_ISCHR(buf->st_mode))
 			printf(" \033[1;33;40m%s\033[0m \n",filename);
 		else
