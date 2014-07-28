@@ -184,7 +184,7 @@ void do_cmd(int argcount, char arglist[100][256])
 	{
 		for (i = 0; arg[i] != NULL; i++)
 		{
-			if (strcmp(arg[i], "<") == 0)
+			if (strcmp(arg[i], ">") == 0)
 			{
 				file = arg[i + 1];
 				arg[i] = NULL;

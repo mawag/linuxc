@@ -23,6 +23,7 @@
 * touch.c
 
 ###第七章
+
 * daemon.c
 * diffork.c
 * difvfork.c
@@ -30,8 +31,8 @@
 * env-e.c
 * fork2.c
 * fork.c
+* fork-ex.c
+* myshell.c
 * priority.c
 * studyid.c
-
-###第八章
 
