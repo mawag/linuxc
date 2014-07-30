@@ -20,7 +20,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
-#include <time.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+
 
 //#define DEBUG
 
@@ -35,7 +38,7 @@ void seerror(const char *error_string, int line)
 }
 
 void print_prompt(void);						/* 打印提示符 */
-void get_input(char *buf);						/* 得到输入的命令 */
+char *get_input(void);						/* 得到输入的命令 */
 void explain_input(char *buf, int *argcount, char arglist[100][256]);	/* 对输入命令进行解析 */
 void do_cmd(int argcount, char arglist[100][256]);			/* 执行命令 */
 int find_command(char *command);					/* 查找命令中的可执行程序 */
@@ -62,24 +65,23 @@ void print_prompt(void)
 		seerror("getenv", __LINE__);
 		exit(1);
 	}
-
-
-
-	printf("%s@%s:%s #", loginname, hostname, path);
+	printf("%s@%s:%s", loginname, hostname, path);
 }
 
 //得到输入的命令
-void get_input(char *buf)
+char *get_input(void)
 {
-	int i = 0;
-	char ch;
+	char *buf;
 
-	ch = getchar();
-	while (ch != '\n') {
-		buf[i++] = ch;
-		ch = getchar();
-	}
-	buf[i] = '\0';
+	rl_bind_key('\t', rl_complete);
+	buf = readline("#");
+	if (!buf)
+        {
+        	seerror("input",__LINE__);
+        	exit(1);
+        }
+        add_history(buf);
+	return buf;
 }
 
 //对输入命令进行解析
@@ -368,28 +370,17 @@ int find_command(char *command)
 	return 0;
 }
 
-int main(int argc, char **argv)
+int fun(void)
 {
 	char *buf;		//记录输入的命令
 	int argcount;		//记录参数个数
 	char arglist[100][256];	//解析出来的参数
 	int i;			//循环变量
 
-	printf("欢迎使用精简版shell\n");
-	buf = malloc(256);
-	if (buf == NULL)
-	{
-		seerror("malloc", __LINE__);
-		exit(1);
-	}
 	do
 	{
 		print_prompt();
-		memset(buf, 0, 256);
-		get_input(buf);
-		#ifdef DEBUG
-		printf("buf = %s\n", buf);
-		#endif
+		buf = get_input();
 		if ((strcmp("exit", buf) == 0)|| (strcmp("logout", buf) == 0))
 		{
 			free(buf);
@@ -402,7 +393,16 @@ int main(int argc, char **argv)
 		}
 		explain_input(buf, &argcount, arglist);
 		do_cmd(argcount, arglist);
+		free(buf);
 	} while (1);
 
 	exit(1);
+}
+
+int main(void)
+{
+
+	printf("欢迎使用精简版shell\n");
+	fun();
+	return 0;
 }
