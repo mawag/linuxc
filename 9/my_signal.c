@@ -23,7 +23,11 @@ void fun(int signo)
 
 int main(int argc,char **argv)
 {
-	signal(SIGINT,fun);
+	if(signal(SIGINT,fun) == SIG_ERR)
+	{
+		perror("signal");
+		exit(1);
+	}
 	while(1);
 
 	return 0;
