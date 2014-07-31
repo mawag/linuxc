@@ -36,3 +36,13 @@
 * priority.c
 * studyid.c
 
+###第八章
+
+* conditionbak.c
+* condition.c
+* createthread.c
+* jointhread.c
+* lock.c
+* oncerun.c
+* pthread_attr_t.md
+* tsd.c
