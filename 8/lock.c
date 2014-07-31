@@ -26,10 +26,20 @@ pthread_mutex_t mutex_t;
 void fun2(void *arg)
 {
 	sleep(1);
+
+
+	//pthread_mutex_lock(&mutex_t);
+	if(pthread_mutex_trylock(&mutex_t) == EBUSY)
+	{
+		printf("地板抢不到，等会!\n");
+		return ;
+	}
 	key = 520;
 	printf("我是地板,key = %d!\n",key);
 
 	printf("我(%lu)为%d带盐!\n",pthread_self(),key);
+
+	pthread_mutex_unlock(&mutex_t);
 
 }
 
@@ -37,18 +47,18 @@ void fun1(void *arg)
 {
 	pthread_t thid;
 
-	key = 2014;
-	printf("板凳表示来了！\n");
-
 	//加锁,普通锁
 	pthread_mutex_lock(&mutex_t);
 	//pthread_mutex_trylock(&mutex_t);
 
-	printf("板凳(%lu)上写着:%d\n",pthread_self(),(int )pthread_getspecific(key));
-	sleep(3);
+	key = 2014;
+	printf("板凳表示来了！\n");
+
+	printf("板凳(%lu)上写着:%d\n",pthread_self(),key);
 	//解锁
-	pthread_mutex_unlock(&mutex_t);
 	printf("the key is %d\n",key);
+	pthread_mutex_unlock(&mutex_t);
+	sleep(3);
 
 }
 
