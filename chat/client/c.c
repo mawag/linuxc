@@ -590,7 +590,7 @@ pro_pack *c_conn_recv(void *tmp)
 	while(1)
 	{
 		memset(&c_recv_data,0,sizeof(c_recv_data));
-		flag = recv(c_us.sock_fd,(void *)&c_recv_data,sizeof(c_recv_data),0);
+		flag = recv(c_us.sock_fd,(void *)&c_recv_data,sizeof(pro_pack),0);
 		if(flag < 0)
 		{
 			perror("recv");

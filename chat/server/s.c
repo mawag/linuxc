@@ -483,7 +483,7 @@ void s_chat_fri(pro_pack *reavdata)
 		{
 			reavdata->flag = 0;
 			flag = 1;
-			if(send(p->sock_fd,&reavdata,sizeof(reavdata), 0)<0)
+			if(send(p->sock_fd,&reavdata,sizeof(pro_pack), 0)<0)
 				perror("send");
 		}
 		p = p->next;
@@ -503,7 +503,7 @@ void s_chat_group(pro_pack *reavdata)
 	
 	while(p != NULL)
 	{
-		if (send(p->sock_fd,&reavdata,sizeof(reavdata),0)==-1)
+		if (send(p->sock_fd,&reavdata,sizeof(pro_pack),0)==-1)
 		{
 			perror("send");
 			printf("error_%s信息发送失败!(sock_fd = %d)\n",p->user,p->sock_fd);
@@ -540,7 +540,7 @@ void s_msg(char *massage)
 		printf("date:%s\n",s_temp.data);
 		printf("_______________________\n");
 		#endif
-		if (send(p->sock_fd,&s_temp,sizeof(s_temp),0)==-1)
+		if (send(p->sock_fd,&s_temp,sizeof(pro_pack),0)==-1)
 		{
 			perror("send");
 			printf("error_全网通告_%s信息发送失败!(sock_fd = %d)\n",p->user,p->sock_fd);
@@ -667,7 +667,7 @@ void fun(int* client_fd)
 	{
 		memset(&recv_data,0,sizeof(recv_data));
 		//接收消息
-		flag = recv(tmp_client_fd,&recv_data,sizeof(recv_data),0);
+		flag = recv(tmp_client_fd,&recv_data,sizeof(pro_pack),0);
 		if(flag == -1)
 		{
 			syslog(LOG_ERR,"recv date failed.\n");
@@ -706,7 +706,7 @@ void fun(int* client_fd)
 			printf("date:%s\n",recv_data.data);
 			printf("_______________________\n");
 			#endif
-			if (send(tmp_client_fd,&recv_data,sizeof(recv_data),0)==-1)
+			if (send(tmp_client_fd,&recv_data,sizeof(pro_pack),0)==-1)
 			{
 				syslog(LOG_ERR,"send date to %s failed.error:%s\n",recv_data.recid,strerror(errno));
 				perror("发送通知信息失败!\n");
